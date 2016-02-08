@@ -2,7 +2,7 @@
 
 namespace Vu;
 
-use League\Container\Container;
+use League\Container\ContainerInterface;
 
 /**
  * Class Dependencies
@@ -10,12 +10,18 @@ use League\Container\Container;
 class Dependencies
 {
     /**
-     * @param Container $container
+     * @param ContainerInterface $container
      */
-    public function define(Container $container)
+    public function define(ContainerInterface $container)
     {
         $container->add('Relay\RelayBuilder', 'Relay\RelayBuilder');
         $container->add('Psr\Http\Message\ResponseInterface', 'Zend\Diactoros\Response');
-        $container->add('vu://framework', 'Vu\Framework');
+        $container->add('Vu\Router\RouteInterface', 'Vu\Router\Route');
+
+        $container->add('vu://router', 'Vu\Router\Router')
+            ->withArgument('Vu\Router\RouteInterface');
+
+        $container->add('vu://framework', 'Vu\Framework')
+            ->withArgument('Relay\RelayBuilder');
     }
 }
