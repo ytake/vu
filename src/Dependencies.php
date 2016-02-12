@@ -16,6 +16,7 @@ class Dependencies
     {
         $container->add('Relay\RelayBuilder', 'Relay\RelayBuilder');
         $container->add('Psr\Http\Message\ResponseInterface', 'Zend\Diactoros\Response');
-        $container->add('vu://framework', 'Vu\Framework');
+        $container->add('vu://framework', 'Vu\Framework')
+            ->withArgument('Relay\RelayBuilder');
     }
 }
