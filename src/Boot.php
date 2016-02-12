@@ -28,9 +28,9 @@ class Boot
     }
 
     /**
-     * @return mixed
+     * @return Framework
      */
-    public function instance()
+    public function instance() : Framework
     {
         if (!$this->cacheable) {
             return $this->container->get('vu://framework');
