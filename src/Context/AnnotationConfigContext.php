@@ -19,4 +19,9 @@ class AnnotationConfigContext
     {
         $this->reader = new AnnotationReader;
     }
+
+    public function register()
+    {
+
+    }
 }

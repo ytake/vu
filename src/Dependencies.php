@@ -21,7 +21,7 @@ class Dependencies
         $container->add('vu://router', 'Vu\Router\Router')
             ->withArgument('Vu\Router\RouteInterface');
 
-        $container->add('vu://framework', 'Vu\Framework')
+        $container->add('vu://framework', 'Vu\Foundation\Application')
             ->withArgument('Relay\RelayBuilder');
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace Vu;
+namespace Vu\Foundation;
 
 use Relay\RelayBuilder;
+use Vu\Context\AnnotationConfigContext;
 use Vu\Foundation\ConfigureEnvironment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -10,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Class Framework
  */
-class Framework
+class Application
 {
     /** @var RelayBuilder */
     protected $builder;
@@ -18,22 +19,25 @@ class Framework
     /** @var array */
     protected $middleware = [];
 
-    /**
-     * Framework constructor.
-     *
-     * @param RelayBuilder $builder
-     */
-    public function __construct(RelayBuilder $builder)
-    {
-        $this->builder = $builder;
-    }
+    /** @var string  */
+    protected $applicationDir;
 
     /**
-     * @param string $path
+     * Application constructor.
+     *
+     * @param RelayBuilder $builder
+     * @param string       $applicationDir
      */
-    protected function webEnvironment($path = __DIR__)
+    public function __construct(RelayBuilder $builder, $applicationDir = __DIR__)
     {
-        $dotenv = new ConfigureEnvironment(new \Dotenv\Dotenv($path));
+        $this->applicationBootstrap();
+        $this->builder = $builder;
+        $this->applicationDir = $applicationDir;
+    }
+
+    protected function webEnvironment()
+    {
+        $dotenv = new ConfigureEnvironment(new \Dotenv\Dotenv($this->applicationDir));
     }
 
     /**
@@ -55,5 +59,10 @@ class Framework
         $relay = $this->builder->newInstance($this->middleware);
 
         return $relay($request, $response);
+    }
+
+    protected function applicationBootstrap()
+    {
+        (new AnnotationConfigContext)->register();
     }
 }

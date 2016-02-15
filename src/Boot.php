@@ -2,6 +2,7 @@
 
 namespace Vu;
 
+use Vu\Foundation\Application;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -28,9 +29,9 @@ class Boot
     }
 
     /**
-     * @return Framework
+     * @return Application
      */
-    public function instance() : Framework
+    public function instance() : Application
     {
         if (!$this->cacheable) {
             return $this->container->get('vu://framework');
