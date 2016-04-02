@@ -4,34 +4,43 @@ namespace Vu\Foundation;
 
 use Relay\RelayBuilder;
 use Vu\Context\AnnotationConfigContext;
-use Vu\Foundation\ConfigureEnvironment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Interop\Container\ContainerInterface;
 
 /**
  * Class Framework
  */
 class Application
 {
+    /** @var array */
+    protected $applicationMiddleware = [
+        'vu://router', // route dispatch
+    ];
+
     /** @var RelayBuilder */
     protected $builder;
 
     /** @var array */
     protected $middleware = [];
 
-    /** @var string  */
+    /** @var string */
     protected $applicationDir;
+
+    /** @var ContainerInterface  */
+    protected $container;
 
     /**
      * Application constructor.
      *
-     * @param RelayBuilder $builder
-     * @param string       $applicationDir
+     * @param RelayBuilder       $builder
+     * @param ContainerInterface $container
+     * @param string             $applicationDir
      */
-    public function __construct(RelayBuilder $builder, $applicationDir = __DIR__)
+    public function __construct(RelayBuilder $builder, ContainerInterface $container, $applicationDir = __DIR__)
     {
-        $this->applicationBootstrap();
         $this->builder = $builder;
+        $this->container = $container;
         $this->applicationDir = $applicationDir;
     }
 
@@ -56,13 +65,30 @@ class Application
      */
     public function run(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $relay = $this->builder->newInstance($this->middleware);
+        $this->applicationBootstrap();
+        $callable = $this->builder->newInstance($this->registerApplicationMiddleware());
 
-        return $relay($request, $response);
+        $response = $callable($request, $response);
+        /** @var \Zend\Diactoros\Response\EmitterInterface $emitter */
+        $emitter = $this->container->get('Vu\Response\AbstractEmitter')->getEmitter();
+        $emitter->emit($response);
     }
 
     protected function applicationBootstrap()
     {
         (new AnnotationConfigContext)->register();
+    }
+
+    /**
+     * @return \stdClass[]
+     */
+    protected function registerApplicationMiddleware() : array
+    {
+        $queue = [];
+        $middlewares = array_merge($this->middleware, $this->applicationMiddleware);
+        foreach ($middlewares as $middleware) {
+            $queue[] = $this->container->get($middleware);
+        }
+        return $queue;
     }
 }

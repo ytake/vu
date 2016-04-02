@@ -42,5 +42,4 @@ class Action implements Queueable
         $invoke = $this->container->get($handler);
         return $invoke($request, $response);
     }
-
 }

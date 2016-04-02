@@ -11,8 +11,6 @@ class BootTest extends \PHPUnit_Framework_TestCase
         $dependency->define($container = new \League\Container\Container());
         $boot = new \Vu\Boot(null, $container);
         $this->assertInstanceOf('Vu\Foundation\Application', $instance = $boot->instance());
-        $instance->middleware($container->get('vu://router'));
-
         $instance->run(ServerRequestFactory::fromGlobals(), new Response());
     }
 }
